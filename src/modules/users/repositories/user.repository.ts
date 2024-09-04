@@ -56,4 +56,32 @@ export class UserRepository extends BaseRepository<UsersEntity> {
       throw ErrorManager.createSignatureError(error.message);
     }
   }
+
+  async findByList(
+    conditions: { key: keyof UserDTO; value: any }[],
+  ): Promise<UsersEntity[] | null> {
+    try {
+      const queryBuilder = this.userRepository
+        .createQueryBuilder('user')
+        .addSelect('user.password');
+
+      conditions.forEach((condition, index) => {
+        const likeValue = `%${condition.value}%`;
+        if (index === 0) {
+          queryBuilder.where(`${condition.key} LIKE :value`, {
+            value: likeValue,
+          });
+        } else {
+          queryBuilder.orWhere(`${condition.key} LIKE :value`, {
+            value: likeValue,
+          });
+        }
+      });
+
+      const users = await queryBuilder.getMany();
+      return users;
+    } catch (error) {
+      throw ErrorManager.createSignatureError(error.message);
+    }
+  }
 }

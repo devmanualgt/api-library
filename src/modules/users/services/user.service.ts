@@ -38,4 +38,8 @@ export class UserService {
   async findBy({ key, value }: { key: keyof UserDTO; value: any }) {
     return this.userRepository.findBy({ key, value });
   }
+
+  async findByList(conditions: { key: keyof UserDTO; value: any }[]) {
+    return this.userRepository.findByList(conditions);
+  }
 }

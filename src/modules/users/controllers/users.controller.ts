@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { UserService } from '../services/user.service';
@@ -30,6 +31,19 @@ export class UsersController {
   @Get('all')
   public async getAll() {
     return await this.userService.getUsers();
+  }
+
+  @Roles('ADMIN')
+  @Get('search')
+  public async search(
+    @Query() query: Record<string, any>, // Captura todos los query params
+  ) {
+    const conditions = Object.entries(query).map(([key, value]) => ({
+      key: key as keyof UserDTO,
+      value,
+    }));
+
+    return await this.userService.findByList(conditions);
   }
 
   @PublicAccess()
