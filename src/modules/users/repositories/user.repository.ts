@@ -18,6 +18,21 @@ export class UserRepository extends BaseRepository<UsersEntity> {
 
   async create(body: UserDTO): Promise<UsersEntity> {
     try {
+      const userByUsername = await this.findBy({
+        key: 'username',
+        value: body.username,
+      });
+      const userByEmail = await this.findBy({
+        key: 'email',
+        value: body.email,
+      });
+
+      if (userByUsername || userByEmail) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'El usuario y/o correo ya existe',
+        });
+      }
       body.password = await bcrypt.hash(body.password, +process.env.HASH_SALT);
       return this.userRepository.save(body);
     } catch (error) {
