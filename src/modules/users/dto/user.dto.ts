@@ -50,6 +50,7 @@ export class UserUpdateDTO {
   @IsNumber()
   age: number;
 
+  @IsOptional()
   @IsEmail()
   email: string;
 
