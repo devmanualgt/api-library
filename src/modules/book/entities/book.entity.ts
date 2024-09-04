@@ -1,7 +1,7 @@
 import { BaseEntity } from '../../../_global/entities/base-entity';
 import { Column, Entity, OneToMany } from 'typeorm';
 import { IBook } from '../interfaces/book.interface';
-import { UserBookEntity } from '../../../modules/users/entities/user-books.entity';
+import { LoanEntity } from '../../users/entities/loans.entity';
 
 @Entity({ name: 'book' })
 export class BookEntity extends BaseEntity implements IBook {
@@ -26,6 +26,6 @@ export class BookEntity extends BaseEntity implements IBook {
   @Column()
   topics: string;
 
-  @OneToMany(() => UserBookEntity, (userBooks) => userBooks.book)
-  usersLoades: UserBookEntity[];
+  @OneToMany(() => LoanEntity, (userBooks) => userBooks.book)
+  usersLoades: LoanEntity[];
 }

@@ -1,4 +1,4 @@
-import { UserBookEntity } from './user-books.entity';
+import { LoanEntity } from './loans.entity';
 import { BaseEntity } from '../../../_global/entities/base-entity';
 import { Column, Entity, OneToMany } from 'typeorm';
 import { IUser } from '../interfaces/user.interface';
@@ -29,6 +29,6 @@ export class UsersEntity extends BaseEntity implements IUser {
   @Column({ type: 'enum', enum: ROLES })
   role: ROLES;
 
-  @OneToMany(() => UserBookEntity, (userBooks) => userBooks.user)
-  booksLoades: UserBookEntity[];
+  @OneToMany(() => LoanEntity, (userBooks) => userBooks.user)
+  booksLoades: LoanEntity[];
 }
