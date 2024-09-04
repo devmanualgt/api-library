@@ -34,4 +34,8 @@ export class UserService {
   async getUserByEmail(email: string): Promise<UsersEntity> {
     return this.userRepository.findByEmail(email);
   }
+
+  async findBy({ key, value }: { key: keyof UserDTO; value: any }) {
+    return this.userRepository.findBy({ key, value });
+  }
 }
