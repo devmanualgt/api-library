@@ -1,11 +1,8 @@
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { DataSource, DataSourceOptions } from 'typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
-import configurationDb from './configuration-db';
-import configurationAuth from './configuration-auth';
 
 ConfigModule.forRoot({
-  load: [configurationDb, configurationAuth],
   envFilePath: `.${process.env.NODE_ENV}.env`,
 });
 
@@ -19,16 +16,12 @@ export const DataSourceConfig: DataSourceOptions = {
   password: configService.get('PASSWORD_DB'),
   database: configService.get('DATABASE_DB'),
   entities: [__dirname + '/../**/**/*.entity{.ts,.js}'],
-  //åmigrations: [__dirname + '/../migrations/*{.ts,.js}'],
-  synchronize: true,
+  migrations: [__dirname + '/../migrations/*{.ts,.js}'],
+  synchronize: false,
   migrationsRun: true,
   logging: false,
   namingStrategy: new SnakeNamingStrategy(),
-  ssl: {
-    rejectUnauthorized: false,
-  },
+  ssl: true,
 };
-
-//console.log(DataSourceConfig.migrations);
 
 export const AppDS = new DataSource(DataSourceConfig);
