@@ -12,7 +12,10 @@ export class BookRepository extends BaseRepository<BookEntity> {
     @InjectRepository(BookEntity)
     private readonly bookRepository: Repository<BookEntity>,
   ) {
-    super(bookRepository); // Llamar al constructor del repositorio base
+    super(bookRepository, [
+      { alias: 'entity', relation: 'usersOnBook' },
+      { alias: 'usersOnBook', relation: 'user' },
+    ]);
   }
 
   async findBy({ key, value }: { key: keyof BookDTO; value: any }) {
