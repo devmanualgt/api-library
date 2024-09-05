@@ -43,6 +43,8 @@ export abstract class BaseRepository<T extends BaseEntity> {
 
       // Aplicar relaciones complejas (joins)
       this.applyJoins(queryBuilder);
+      queryBuilder.orderBy('entity.id', 'ASC');
+
       const tuplas: T[] = await queryBuilder.getMany();
       if (tuplas.length === 0) {
         throw new ErrorManager({
