@@ -3,6 +3,7 @@ import { AuthGuard } from '../../../modules/auth/guards/auth.guard';
 import { RolesGuard } from '../../../modules/auth/guards/roles.guard';
 import { UserService } from '../services/user.service';
 import { UserLoanBookDTO, UserReturnBookDTO } from '../dto/user.dto';
+import { response } from 'src/util/response.manager';
 
 @Controller('users/loans')
 @UseGuards(AuthGuard, RolesGuard)
@@ -11,7 +12,8 @@ export class LoanController {
 
   @Post('new')
   async loandBook(@Body() body: UserLoanBookDTO) {
-    return await this.userService.userLoadBook(body);
+    /* return await this.userService.userLoadBook(body);
+    return response(true, '') */
   }
 
   @Post('return')
