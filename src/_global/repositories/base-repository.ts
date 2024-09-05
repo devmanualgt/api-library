@@ -1,7 +1,6 @@
 import {
   Repository,
   DeepPartial,
-  FindOptionsWhere,
   UpdateResult,
   DeleteResult,
   SelectQueryBuilder,
@@ -33,8 +32,19 @@ export abstract class BaseRepository<T extends BaseEntity> {
   }
 
   async create(entity: DeepPartial<T>): Promise<T> {
-    const newEntity = this.repository.create(entity);
-    return this.repository.save(newEntity);
+    try {
+      const newEntity = this.repository.create(entity);
+      if (!newEntity) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'Error al guardar el registro',
+        });
+      }
+      return await this.repository.save(newEntity);
+      //return response(true, 'Registro guardado, correctamente', save);
+    } catch (error) {
+      throw ErrorManager.createSignatureError(error.message);
+    }
   }
 
   async findAll(): Promise<T[]> {
@@ -52,6 +62,7 @@ export abstract class BaseRepository<T extends BaseEntity> {
           message: 'No se encontró resultado',
         });
       }
+      // return response(true, 'Datos consultados correctamente', tuplas);
       return tuplas;
     } catch (error) {
       throw ErrorManager.createSignatureError(error.message);
@@ -71,10 +82,11 @@ export abstract class BaseRepository<T extends BaseEntity> {
       if (!tupla) {
         throw new ErrorManager({
           type: 'BAD_REQUEST',
-          message: 'No se encontró resultado',
+          message: 'No se encontró resultado -- ',
         });
       }
 
+      //      return response(true, 'Datos consultados correctamente', tupla);
       return tupla;
     } catch (error) {
       throw ErrorManager.createSignatureError(error.message);
@@ -107,10 +119,11 @@ export abstract class BaseRepository<T extends BaseEntity> {
         });
       }
 
-      return {
+      /* return response(true, 'Datos actualizados correctamente', {
         updateResult,
         updatedEntity,
-      };
+      }); */
+      return { updateResult, updatedEntity };
     } catch (error) {
       throw ErrorManager.createSignatureError(error.message);
     }
@@ -127,6 +140,7 @@ export abstract class BaseRepository<T extends BaseEntity> {
         });
       }
 
+      //return response(true, 'Registro eliminado correctamente', tupla);
       return tupla;
     } catch (error) {
       throw ErrorManager.createSignatureError(error.message);
