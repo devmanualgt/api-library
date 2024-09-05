@@ -4,12 +4,33 @@ import {
   FindOptionsWhere,
   UpdateResult,
   DeleteResult,
+  SelectQueryBuilder,
 } from 'typeorm';
 import { BaseEntity } from '../entities/base-entity';
 import { ErrorManager } from '../..//util/error.manager';
 
+type RelationConfig = {
+  alias: string;
+  relation: string;
+};
 export abstract class BaseRepository<T extends BaseEntity> {
-  protected constructor(private readonly repository: Repository<T>) {}
+  private joinRelations: RelationConfig[];
+
+  protected constructor(
+    private readonly repository: Repository<T>,
+    joinRelations: RelationConfig[] = [], // Para relaciones complejas
+  ) {
+    this.joinRelations = joinRelations;
+  }
+
+  private applyJoins(queryBuilder: SelectQueryBuilder<T>) {
+    this.joinRelations.forEach((join) => {
+      queryBuilder.leftJoinAndSelect(
+        `${join.alias}.${join.relation}`,
+        join.relation,
+      );
+    });
+  }
 
   async create(entity: DeepPartial<T>): Promise<T> {
     const newEntity = this.repository.create(entity);
@@ -18,11 +39,15 @@ export abstract class BaseRepository<T extends BaseEntity> {
 
   async findAll(): Promise<T[]> {
     try {
-      const tuplas: T[] = await this.repository.find();
+      const queryBuilder = this.repository.createQueryBuilder('entity');
+
+      // Aplicar relaciones complejas (joins)
+      this.applyJoins(queryBuilder);
+      const tuplas: T[] = await queryBuilder.getMany();
       if (tuplas.length === 0) {
         throw new ErrorManager({
           type: 'BAD_REQUEST',
-          message: 'No se encontro resultado',
+          message: 'No se encontró resultado',
         });
       }
       return tuplas;
@@ -33,13 +58,18 @@ export abstract class BaseRepository<T extends BaseEntity> {
 
   async findOne(id: number): Promise<T> {
     try {
-      const tupla: T = await this.repository.findOne({
-        where: { id } as FindOptionsWhere<T>,
-      });
+      const queryBuilder = this.repository
+        .createQueryBuilder('entity')
+        .where('entity.id = :id', { id });
+
+      // Aplicar relaciones complejas (joins)
+      this.applyJoins(queryBuilder);
+
+      const tupla: T | undefined = await queryBuilder.getOne();
       if (!tupla) {
         throw new ErrorManager({
           type: 'BAD_REQUEST',
-          message: 'No se encontro resultado',
+          message: 'No se encontró resultado',
         });
       }
 
@@ -75,7 +105,6 @@ export abstract class BaseRepository<T extends BaseEntity> {
         });
       }
 
-      //return tupla;
       return {
         updateResult,
         updatedEntity,

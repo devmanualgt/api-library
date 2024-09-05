@@ -13,7 +13,10 @@ export class UserRepository extends BaseRepository<UsersEntity> {
     @InjectRepository(UsersEntity)
     private readonly userRepository: Repository<UsersEntity>,
   ) {
-    super(userRepository); // Llamar al constructor del repositorio base
+    super(userRepository, [
+      { alias: 'entity', relation: 'booksOnLoan' },
+      { alias: 'booksOnLoan', relation: 'book' }, // Joins complejos
+    ]);
   }
 
   async create(body: UserDTO): Promise<UsersEntity> {
