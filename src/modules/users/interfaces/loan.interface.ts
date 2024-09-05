@@ -5,5 +5,5 @@ export interface ILoan {
   user: UsersEntity;
   book: BookEntity;
   returnDate: Date;
-  quantity: number;
+  loanTerminate: boolean;
 }

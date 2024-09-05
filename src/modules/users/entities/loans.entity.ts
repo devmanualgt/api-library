@@ -12,8 +12,8 @@ export class UserLoanEntity extends BaseEntity implements ILoan {
   })
   returnDate: Date | null;
 
-  @Column({ default: 1 })
-  quantity: number;
+  @Column({ default: false }) // Para gestionar si se han entregado todos los libros prestados
+  loanTerminate: boolean;
 
   @ManyToOne(() => UsersEntity, (user) => user.booksOnLoan)
   user: UsersEntity;

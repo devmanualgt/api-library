@@ -77,9 +77,11 @@ export class UserLoanBookDTO {
   book: BookEntity;
 
   @IsOptional()
-  @IsNumber()
-  quantity: number;
-
-  @IsOptional()
   returnDate: Date;
+}
+
+export class UserReturnBookDTO {
+  @IsNotEmpty()
+  @IsNumber()
+  loan_id: number;
 }
