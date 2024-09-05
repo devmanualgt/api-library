@@ -1,9 +1,9 @@
-import { LoanEntity } from './loans.entity';
 import { BaseEntity } from '../../../_global/entities/base-entity';
 import { Column, Entity, OneToMany } from 'typeorm';
 import { IUser } from '../interfaces/user.interface';
 import { ROLES } from '../../../constants/roles';
 import { Exclude } from 'class-transformer';
+import { UserLoanEntity } from './loans.entity';
 
 @Entity({ name: 'users' })
 export class UsersEntity extends BaseEntity implements IUser {
@@ -29,6 +29,6 @@ export class UsersEntity extends BaseEntity implements IUser {
   @Column({ type: 'enum', enum: ROLES })
   role: ROLES;
 
-  @OneToMany(() => LoanEntity, (userBooks) => userBooks.user)
-  booksLoades: LoanEntity[];
+  @OneToMany(() => UserLoanEntity, (userBooks) => userBooks.user)
+  booksOnLoan: UserLoanEntity[];
 }
