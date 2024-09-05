@@ -1,17 +1,11 @@
-import {
-  IsArray,
-  IsNotEmpty,
-  IsNumber,
-  IsOptional,
-  IsString,
-} from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class BookDTO {
-  @IsNotEmpty()
-  @IsString()
+  @IsNotEmpty({ message: 'Titulo requerido' })
+  @IsString({ message: 'string' })
   title: string;
 
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'Autor requerido' })
   @IsString()
   author: string;
 
@@ -27,7 +21,7 @@ export class BookDTO {
   @IsNumber()
   copies: number;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
   quantity: number;
 

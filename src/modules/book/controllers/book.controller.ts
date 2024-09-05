@@ -19,7 +19,7 @@ import { Roles } from 'src/modules/auth/decorators/roles.decorator';
 export class BookController {
   constructor(private readonly bookService: BookService) {}
 
-  //@Roles('ADMIN')
+  @Roles('ADMIN')
   @Post()
   async create(@Body() body: BookDTO) {
     return await this.bookService.createBook(body);

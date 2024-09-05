@@ -21,14 +21,14 @@ import { Roles } from 'src/modules/auth/decorators/roles.decorator';
 export class UsersController {
   constructor(private readonly userService: UserService) {}
 
-  @Roles('ADMIN')
-  @Post('create')
+  // @Roles('ADMIN')
+  @Post('')
   public async create(@Body() body: UserDTO) {
     return await this.userService.createUser(body);
   }
 
   @Roles('ADMIN')
-  @Get('all')
+  @Get('')
   public async getAll() {
     return await this.userService.getUsers();
   }
@@ -53,7 +53,7 @@ export class UsersController {
   }
 
   @Roles('ADMIN')
-  @Put('edit/:id')
+  @Put(':id')
   public async updateUser(
     @Param('id') id: number,
     @Body() body: UserUpdateDTO,
@@ -62,7 +62,7 @@ export class UsersController {
   }
 
   @Roles('ADMIN')
-  @Delete('delete/:id')
+  @Delete(':id')
   public async deleteUser(@Param('id') id: number) {
     return await this.userService.deleteUser(id);
   }

@@ -15,14 +15,6 @@ export class BookRepository extends BaseRepository<BookEntity> {
     super(bookRepository); // Llamar al constructor del repositorio base
   }
 
-  /*  async create(body: BookDTO): Promise<BookEntity> {
-    try {
-      return this.bookRepository.save(body);
-    } catch (error) {
-      throw ErrorManager.createSignatureError(error.message);
-    }
-  } */
-
   async findBy({ key, value }: { key: keyof BookDTO; value: any }) {
     try {
       const book: BookEntity = await this.bookRepository

@@ -66,15 +66,33 @@ export class UserRepository extends BaseRepository<UsersEntity> {
         .addSelect('user.password');
 
       conditions.forEach((condition, index) => {
-        const likeValue = `%${condition.value}%`;
-        if (index === 0) {
-          queryBuilder.where(`${condition.key} LIKE :value`, {
-            value: likeValue,
-          });
+        const value = condition.value;
+
+        // Verificar si el campo es de tipo string para usar LIKE, si no, usar igualdad
+        const isStringColumn = [
+          'firstName',
+          'lastName',
+          'email',
+          'username',
+        ].includes(condition.key as string);
+
+        if (isStringColumn) {
+          const likeValue = `%${value}%`;
+          if (index === 0) {
+            queryBuilder.where(`${condition.key} LIKE :value`, {
+              value: likeValue,
+            });
+          } else {
+            queryBuilder.orWhere(`${condition.key} LIKE :value`, {
+              value: likeValue,
+            });
+          }
         } else {
-          queryBuilder.orWhere(`${condition.key} LIKE :value`, {
-            value: likeValue,
-          });
+          if (index === 0) {
+            queryBuilder.where(`${condition.key} = :value`, { value });
+          } else {
+            queryBuilder.orWhere(`${condition.key} = :value`, { value });
+          }
         }
       });
 

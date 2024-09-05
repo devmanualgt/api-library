@@ -20,7 +20,7 @@ export class BookEntity extends BaseEntity implements IBook {
   @Column()
   copies: number;
 
-  @Column()
+  @Column({ default: 0 })
   quantity: number;
 
   @Column()
