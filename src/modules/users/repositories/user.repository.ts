@@ -15,7 +15,7 @@ export class UserRepository extends BaseRepository<UsersEntity> {
   ) {
     super(userRepository, [
       { alias: 'entity', relation: 'booksOnLoan' },
-      { alias: 'booksOnLoan', relation: 'book' }, // Joins complejos
+      { alias: 'booksOnLoan', relation: 'book' },
     ]);
   }
 
@@ -41,6 +41,37 @@ export class UserRepository extends BaseRepository<UsersEntity> {
     } catch (error) {
       throw ErrorManager.createSignatureError(error.message);
     }
+  }
+
+  async findAllAgrup(): Promise<any[]> {
+    const all = await this.findAll();
+    const agrup = all.map((user) => {
+      const groupedLoans = {
+        activeLoans: [],
+        completedLoans: [],
+      };
+
+      // Si hay préstamos en booksOnLoan
+      if (user.booksOnLoan.length > 0) {
+        user.booksOnLoan.forEach((loan) => {
+          if (loan.loanTerminate) {
+            groupedLoans.completedLoans.push(loan);
+          } else {
+            groupedLoans.activeLoans.push(loan);
+          }
+        });
+      }
+
+      // Retornar el usuario con los préstamos agrupados
+      const { booksOnLoan, ...restUser } = user; // Eliminar booksOnLoan
+
+      return {
+        ...restUser,
+        loans: groupedLoans,
+      };
+    });
+
+    return agrup;
   }
 
   async findByEmail(email: string): Promise<UsersEntity> {

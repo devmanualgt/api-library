@@ -1,6 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { UsersEntity } from '../entities/user.entity';
-import { UserDTO, UserLoanBookDTO, UserUpdateDTO } from '../dto/user.dto';
+import {
+  UserDTO,
+  UserLoanBookDTO,
+  UserReturnBookDTO,
+  UserUpdateDTO,
+} from '../dto/user.dto';
 import { UserRepository } from '../repositories/user.repository';
 import { DeleteResult, UpdateResult } from 'typeorm';
 import { UserLoandRepository } from '../repositories/user.loan.repository';
@@ -16,8 +21,8 @@ export class UserService {
     return this.userRepository.create(createUserDto);
   }
 
-  async getUsers(): Promise<UsersEntity[]> {
-    return this.userRepository.findAll();
+  async getUsers(): Promise<any[]> {
+    return this.userRepository.findAllAgrup();
   }
 
   async getUserById(id: number): Promise<UsersEntity> {
@@ -49,5 +54,9 @@ export class UserService {
 
   async userLoadBook(body: UserLoanBookDTO) {
     return await this.userLoadRepository.userLoadBook(body);
+  }
+
+  async userRetunBook(body: UserReturnBookDTO) {
+    return await this.userLoadRepository.userReturnBook(body);
   }
 }

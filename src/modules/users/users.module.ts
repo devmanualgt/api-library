@@ -7,10 +7,15 @@ import { UserRepository } from './repositories/user.repository';
 import { UserLoanEntity } from './entities/loans.entity';
 import { LoanController } from './controllers/loan.controller';
 import { UserLoandRepository } from './repositories/user.loan.repository';
+import { BookRepository } from '../book/repositories/book.repository';
+import { BookModule } from '../book/book.module';
 
 @Global()
 @Module({
-  imports: [TypeOrmModule.forFeature([UsersEntity, UserLoanEntity])],
+  imports: [
+    TypeOrmModule.forFeature([UsersEntity, UserLoanEntity]),
+    BookModule,
+  ],
   controllers: [UsersController, LoanController],
   providers: [UserService, UserRepository, UserLoandRepository],
   exports: [UserService, UserRepository, UserLoandRepository, TypeOrmModule],
