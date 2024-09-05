@@ -6,9 +6,9 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { PUBLIC_KEY } from 'src/constants/key-decorators';
+import { PUBLIC_KEY } from '../../../constants/key-decorators';
 import { Request } from 'express';
-import { useToken } from 'src/util/use.token';
+import { useToken } from '../../../util/use.token';
 import { IUseToken } from '../interfaces/auth.interface';
 
 @Injectable()

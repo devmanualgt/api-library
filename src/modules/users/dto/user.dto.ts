@@ -6,7 +6,7 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
-import { ROLES } from 'src/constants/roles';
+import { ROLES } from '../../../constants/roles';
 
 export class UserDTO {
   @IsNotEmpty()

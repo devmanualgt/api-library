@@ -1,4 +1,4 @@
-import { BookEntity } from 'src/modules/book/entities/book.entity';
+import { BookEntity } from '../../../modules/book/entities/book.entity';
 import { UsersEntity } from '../entities/user.entity';
 
 export interface ILoan {

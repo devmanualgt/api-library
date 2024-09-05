@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { BaseRepository } from 'src/_global/repositories/base-repository';
+import { BaseRepository } from '../../../_global/repositories/base-repository';
 import { Repository } from 'typeorm';
-import { ErrorManager } from 'src/util/error.manager';
+import { ErrorManager } from '../../../util/error.manager';
 import { BookEntity } from '../entities/book.entity';
 import { BookDTO } from '../dto/book.dto';
 

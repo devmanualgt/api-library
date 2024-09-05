@@ -1,4 +1,4 @@
-import { AuthGuard } from 'src/modules/auth/guards/auth.guard';
+import { AuthGuard } from '../../../modules/auth/guards/auth.guard';
 import { BookDTO, UpdateBookDTO } from '../dto/book.dto';
 import { BookService } from './../services/book.service';
 import {
@@ -11,8 +11,8 @@ import {
   Put,
   UseGuards,
 } from '@nestjs/common';
-import { RolesGuard } from 'src/modules/auth/guards/roles.guard';
-import { Roles } from 'src/modules/auth/decorators/roles.decorator';
+import { RolesGuard } from '../../../modules/auth/guards/roles.guard';
+import { Roles } from '../../../modules/auth/decorators/roles.decorator';
 
 @Controller('books')
 @UseGuards(AuthGuard, RolesGuard)

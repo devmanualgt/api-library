@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { BaseRepository } from 'src/_global/repositories/base-repository';
 import { Repository } from 'typeorm';
 import { UsersEntity } from '../entities/user.entity';
 import { UserDTO } from '../dto/user.dto';
 import * as bcrypt from 'bcrypt';
-import { ErrorManager } from 'src/util/error.manager';
+import { ErrorManager } from '../../../util/error.manager';
+import { BaseRepository } from '../../../_global/repositories/base-repository';
 
 @Injectable()
 export class UserRepository extends BaseRepository<UsersEntity> {

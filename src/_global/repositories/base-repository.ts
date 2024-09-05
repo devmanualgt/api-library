@@ -6,7 +6,7 @@ import {
   DeleteResult,
 } from 'typeorm';
 import { BaseEntity } from '../entities/base-entity';
-import { ErrorManager } from 'src/util/error.manager';
+import { ErrorManager } from '../..//util/error.manager';
 
 export abstract class BaseRepository<T extends BaseEntity> {
   protected constructor(private readonly repository: Repository<T>) {}

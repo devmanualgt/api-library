@@ -11,10 +11,10 @@ import {
 } from '@nestjs/common';
 import { UserService } from '../services/user.service';
 import { UserDTO, UserUpdateDTO } from '../dto/user.dto';
-import { PublicAccess } from 'src/modules/auth/decorators/public.decorator';
-import { AuthGuard } from 'src/modules/auth/guards/auth.guard';
-import { RolesGuard } from 'src/modules/auth/guards/roles.guard';
-import { Roles } from 'src/modules/auth/decorators/roles.decorator';
+import { PublicAccess } from '../../../modules/auth/decorators/public.decorator';
+import { AuthGuard } from '../../../modules/auth/guards/auth.guard';
+import { RolesGuard } from '../../../modules/auth/guards/roles.guard';
+import { Roles } from '../../../modules/auth/decorators/roles.decorator';
 
 @Controller('users')
 @UseGuards(AuthGuard, RolesGuard)
