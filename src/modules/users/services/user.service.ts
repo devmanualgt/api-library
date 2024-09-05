@@ -18,30 +18,30 @@ export class UserService {
   ) {}
 
   async createUser(createUserDto: UserDTO): Promise<UsersEntity> {
-    return this.userRepository.create(createUserDto);
+    return await this.userRepository.create(createUserDto);
   }
 
   async getUsers(): Promise<any[]> {
-    return this.userRepository.findAllAgrup();
+    return await this.userRepository.findAllAgrup();
   }
 
   async getUserById(id: number): Promise<UsersEntity> {
-    return this.userRepository.findOne(id);
+    return await this.userRepository.findOne(id);
   }
 
   async updateUser(
     id: number,
     updateUserDto: Partial<UserUpdateDTO>,
   ): Promise<{ updateResult: UpdateResult; updatedEntity?: UsersEntity }> {
-    return this.userRepository.update(id, updateUserDto);
+    return await this.userRepository.update(id, updateUserDto);
   }
 
   async deleteUser(id: number): Promise<DeleteResult> {
-    return this.userRepository.delete(id);
+    return await this.userRepository.delete(id);
   }
 
   async getUserByEmail(email: string): Promise<UsersEntity> {
-    return this.userRepository.findByEmail(email);
+    return await this.userRepository.findByEmail(email);
   }
 
   async findBy({ key, value }: { key: keyof UserDTO; value: any }) {
