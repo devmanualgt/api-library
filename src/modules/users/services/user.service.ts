@@ -23,7 +23,7 @@ export class UserService {
   async updateUser(
     id: number,
     updateUserDto: Partial<UserUpdateDTO>,
-  ): Promise<UpdateResult | undefined> {
+  ): Promise<{ updateResult: UpdateResult; updatedEntity?: UsersEntity }> {
     return this.userRepository.update(id, updateUserDto);
   }
 

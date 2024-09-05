@@ -9,6 +9,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { RolesGuard } from '../../../modules/auth/guards/roles.guard';
@@ -28,6 +29,19 @@ export class BookController {
   @Get()
   async getAll() {
     return await this.bookService.getBooks();
+  }
+
+  @Roles('ADMIN')
+  @Get('search')
+  public async search(
+    @Query() query: Record<string, any>, // Captura todos los query params
+  ) {
+    const conditions = Object.entries(query).map(([key, value]) => ({
+      key: key as keyof BookDTO,
+      value,
+    }));
+
+    return await this.bookService.findByList(conditions);
   }
 
   @Get(':id')

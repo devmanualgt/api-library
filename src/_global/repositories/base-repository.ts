@@ -52,21 +52,34 @@ export abstract class BaseRepository<T extends BaseEntity> {
   async update(
     id: number,
     updateEntityDto: any,
-  ): Promise<UpdateResult | undefined> {
+  ): Promise<{ updateResult: UpdateResult; updatedEntity?: T }> {
     try {
-      const tupla: UpdateResult = await this.repository.update(
+      const updateResult: UpdateResult = await this.repository.update(
         id,
         updateEntityDto,
       );
 
-      if (tupla.affected === 0) {
+      if (updateResult.affected === 0) {
         throw new ErrorManager({
           type: 'BAD_REQUEST',
           message: 'No se encontro resultado',
         });
       }
 
-      return tupla;
+      const updatedEntity: T | undefined = await this.findOne(id);
+
+      if (!updatedEntity) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'No se encontró la entidad actualizada',
+        });
+      }
+
+      //return tupla;
+      return {
+        updateResult,
+        updatedEntity,
+      };
     } catch (error) {
       throw ErrorManager.createSignatureError(error.message);
     }
