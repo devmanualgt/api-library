@@ -59,4 +59,12 @@ export class UserService {
   async userRetunBook(body: UserReturnBookDTO) {
     return await this.userLoadRepository.userReturnBook(body);
   }
+
+  async getLoansFilter(terminate: boolean) {
+    return await this.userLoadRepository.getLoansFilter(terminate);
+  }
+
+  async getLoans() {
+    return await this.userLoadRepository.findAll();
+  }
 }
