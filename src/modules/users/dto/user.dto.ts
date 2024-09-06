@@ -19,7 +19,7 @@ export class UserDTO {
   @IsString()
   lastName: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
   age: number;
 

@@ -82,11 +82,10 @@ export abstract class BaseRepository<T extends BaseEntity> {
       if (!tupla) {
         throw new ErrorManager({
           type: 'BAD_REQUEST',
-          message: 'No se encontró resultado -- ',
+          message: 'No se encontró resultado',
         });
       }
 
-      //      return response(true, 'Datos consultados correctamente', tupla);
       return tupla;
     } catch (error) {
       throw ErrorManager.createSignatureError(error.message);

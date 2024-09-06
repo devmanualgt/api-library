@@ -23,6 +23,12 @@ export class BookEntity extends BaseEntity implements IBook {
   @Column({ default: 0 })
   quantity: number;
 
+  @Column({
+    default:
+      'https://myprecargas.s3.amazonaws.com/banners/20240906T003033787.png',
+  })
+  link_img: string;
+
   @Column()
   topics: string;
 

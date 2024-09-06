@@ -6,4 +6,5 @@ export interface IBook {
   copies: number;
   quantity: number;
   topics: string;
+  link_img: string;
 }
