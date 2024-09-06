@@ -56,12 +56,12 @@ export abstract class BaseRepository<T extends BaseEntity> {
       queryBuilder.orderBy('entity.id', 'ASC');
 
       const tuplas: T[] = await queryBuilder.getMany();
-      if (tuplas.length === 0) {
+      /* if (tuplas.length === 0) {
         throw new ErrorManager({
           type: 'BAD_REQUEST',
           message: 'No se encontró resultado',
         });
-      }
+      } */
       // return response(true, 'Datos consultados correctamente', tuplas);
       return tuplas;
     } catch (error) {
