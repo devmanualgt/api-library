@@ -23,8 +23,6 @@ export class UserLoandRepository extends BaseRepository<UserLoanEntity> {
 
   async userLoadBook(body: UserLoanBookDTO) {
     try {
-      console.log(body.user);
-
       const existingLoan = await this.userLoandRepository.findOne({
         where: {
           user: { id: +body.user },
@@ -32,8 +30,6 @@ export class UserLoandRepository extends BaseRepository<UserLoanEntity> {
           loanTerminate: false,
         },
       });
-
-      console.log(existingLoan);
 
       if (existingLoan) {
         throw new ErrorManager({
@@ -67,15 +63,12 @@ export class UserLoandRepository extends BaseRepository<UserLoanEntity> {
   async userReturnBook(body: UserReturnBookDTO) {
     try {
       const loan = await this.findOne(body.loan_id);
-
       if (loan.loanTerminate) {
         throw new ErrorManager({
-          type: 'NO_CONTENT',
+          type: 'BAD_REQUEST',
           message: 'El libro ya fue devuelto',
         });
       }
-
-      console.log(loan);
 
       loan.returnDate = new Date();
       loan.loanTerminate = true;
@@ -87,8 +80,20 @@ export class UserLoandRepository extends BaseRepository<UserLoanEntity> {
         });
       }
 
-      await this.update(body.loan_id, loan);
-      return response(true, 'Libro devuelto.');
+      return await this.update(body.loan_id, loan);
+    } catch (error) {
+      throw ErrorManager.createSignatureError(error.message);
+    }
+  }
+
+  async getLoansFilter(terminate?: boolean) {
+    try {
+      const loans = await this.findAll();
+      const filteredLoans = loans.filter(
+        (loan) => loan.loanTerminate === terminate,
+      );
+
+      return filteredLoans;
     } catch (error) {
       throw ErrorManager.createSignatureError(error.message);
     }

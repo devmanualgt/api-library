@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../../../modules/auth/guards/auth.guard';
 import { RolesGuard } from '../../../modules/auth/guards/roles.guard';
 import { UserService } from '../services/user.service';
@@ -12,12 +12,25 @@ export class LoanController {
 
   @Post('new')
   async loandBook(@Body() body: UserLoanBookDTO) {
-    /* return await this.userService.userLoadBook(body);
-    return response(true, '') */
+    const loan = await this.userService.userLoadBook(body);
+    return response(true, 'Prestamo del libro realizado', loan);
   }
 
   @Post('return')
   async returnBook(@Body() body: UserReturnBookDTO) {
-    return await this.userService.userRetunBook(body);
+    const ret = await this.userService.userRetunBook(body);
+    return response(true, 'Libro devuelto', ret);
+  }
+
+  @Get('list')
+  async getLoansFilter(@Query('terminate') terminate?: string) {
+    let list;
+    if (terminate) {
+      const terminateBool = terminate === 'true';
+      list = await this.userService.getLoansFilter(terminateBool);
+    } else {
+      list = await this.userService.getLoans();
+    }
+    return response(true, 'Prestamos', list);
   }
 }
