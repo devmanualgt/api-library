@@ -30,7 +30,7 @@ export class AuthGuard implements CanActivate {
     const req = context.switchToHttp().getRequest<Request>();
     const token = req.headers['authorization'];
     if (!token || Array.isArray(token)) {
-      throw new UnauthorizedException('Invalid token');
+      throw new UnauthorizedException('Token invalido');
     }
 
     const manageToken: IUseToken | string = useToken(token);
@@ -39,13 +39,13 @@ export class AuthGuard implements CanActivate {
     }
 
     if (manageToken.isExprired) {
-      throw new UnauthorizedException('Token expired');
+      throw new UnauthorizedException('Token expirado');
     }
 
     const { sub } = manageToken;
     const user = await this.userService.getUserById(+sub);
     if (!user) {
-      throw new UnauthorizedException('Invalid user');
+      throw new UnauthorizedException('Usuario no valido');
     }
 
     req.idUser = user.id;

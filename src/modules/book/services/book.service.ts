@@ -9,33 +9,33 @@ export class BookService {
   constructor(private readonly bookRepository: BookRepository) {}
 
   async createBook(createUserDto: BookDTO): Promise<BookEntity> {
-    return this.bookRepository.create(createUserDto);
+    return await this.bookRepository.create(createUserDto);
   }
 
   async getBooks(): Promise<BookEntity[]> {
-    return this.bookRepository.findAll();
+    return await this.bookRepository.findAll();
   }
 
   async getBookById(id: number): Promise<BookEntity> {
-    return this.bookRepository.findOne(id);
+    return await this.bookRepository.findOne(id);
   }
 
   async updateBook(
     id: number,
     updateUserDto: Partial<UpdateBookDTO>,
-  ): Promise<UpdateResult | undefined> {
-    return this.bookRepository.update(id, updateUserDto);
+  ): Promise<{ updateResult: UpdateResult; updatedEntity?: BookEntity }> {
+    return await this.bookRepository.update(id, updateUserDto);
   }
 
   async deleteBook(id: number): Promise<DeleteResult> {
-    return this.bookRepository.delete(id);
+    return await this.bookRepository.delete(id);
   }
 
   async findBy({ key, value }: { key: keyof BookDTO; value: any }) {
-    return this.bookRepository.findBy({ key, value });
+    return await this.bookRepository.findBy({ key, value });
   }
 
   async findByList(conditions: { key: keyof BookDTO; value: any }[]) {
-    return this.bookRepository.findByList(conditions);
+    return await this.bookRepository.findByList(conditions);
   }
 }

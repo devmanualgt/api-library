@@ -4,6 +4,7 @@ import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
 import { UsersEntity } from '../../../modules/users/entities/user.entity';
 import { PayloadToken } from '../interfaces/auth.interface';
+import { response } from '../../../util/response.manager';
 
 @Injectable()
 export class AuthService {
@@ -56,13 +57,13 @@ export class AuthService {
       username: getUser.username,
     };
 
-    return {
+    return response(true, 'Login success', {
       accessToken: this.singJWT({
         payload: payload,
         secret: process.env.SECRET_KEY_AUTH,
         expires: '1h',
       }),
       user,
-    };
+    });
   }
 }

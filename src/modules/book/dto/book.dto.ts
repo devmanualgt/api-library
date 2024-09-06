@@ -28,6 +28,10 @@ export class BookDTO {
   @IsNotEmpty()
   @IsString()
   topics: string;
+
+  @IsOptional()
+  @IsString()
+  link_img: string;
 }
 
 export class UpdateBookDTO {
@@ -58,4 +62,8 @@ export class UpdateBookDTO {
   @IsOptional()
   @IsString()
   topics: string;
+
+  @IsOptional()
+  @IsString()
+  link_img: string;
 }

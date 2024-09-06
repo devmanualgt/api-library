@@ -7,6 +7,8 @@ import {
   IsString,
 } from 'class-validator';
 import { ROLES } from '../../../constants/roles';
+import { UsersEntity } from '../entities/user.entity';
+import { BookEntity } from '../../../modules/book/entities/book.entity';
 
 export class UserDTO {
   @IsNotEmpty()
@@ -17,7 +19,7 @@ export class UserDTO {
   @IsString()
   lastName: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
   age: number;
 
@@ -65,4 +67,21 @@ export class UserUpdateDTO {
   @IsOptional()
   @IsEnum(ROLES)
   role: ROLES;
+}
+
+export class UserLoanBookDTO {
+  @IsNotEmpty()
+  user: UsersEntity;
+
+  @IsNotEmpty()
+  book: BookEntity;
+
+  @IsOptional()
+  returnDate: Date;
+}
+
+export class UserReturnBookDTO {
+  @IsNotEmpty()
+  @IsNumber()
+  loan_id: number;
 }

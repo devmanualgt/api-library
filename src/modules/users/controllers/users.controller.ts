@@ -15,6 +15,7 @@ import { PublicAccess } from '../../../modules/auth/decorators/public.decorator'
 import { AuthGuard } from '../../../modules/auth/guards/auth.guard';
 import { RolesGuard } from '../../../modules/auth/guards/roles.guard';
 import { Roles } from '../../../modules/auth/decorators/roles.decorator';
+import { response } from '../../../util/response.manager';
 
 @Controller('users')
 @UseGuards(AuthGuard, RolesGuard)
@@ -24,13 +25,15 @@ export class UsersController {
   // @Roles('ADMIN')
   @Post('')
   public async create(@Body() body: UserDTO) {
-    return await this.userService.createUser(body);
+    const users = await this.userService.createUser(body);
+    return response(true, 'Usuario creado correctamente', users);
   }
 
   @Roles('ADMIN')
   @Get('')
   public async getAll() {
-    return await this.userService.getUsers();
+    const users = await this.userService.getUsers();
+    return response(true, 'Usuarios consultados correctamente', users);
   }
 
   @Roles('ADMIN')
@@ -43,13 +46,16 @@ export class UsersController {
       value,
     }));
 
-    return await this.userService.findByList(conditions);
+    const users = await this.userService.findByList(conditions);
+
+    return response(true, 'Usuarios consultados correctamente', users);
   }
 
   @PublicAccess()
   @Get(':id')
   public async findUserById(@Param('id') id: number) {
-    return await this.userService.getUserById(id);
+    const user = await this.userService.getUserById(id);
+    return response(true, 'Usuario consultados correctamente', user);
   }
 
   @Roles('ADMIN')
@@ -58,12 +64,15 @@ export class UsersController {
     @Param('id') id: number,
     @Body() body: UserUpdateDTO,
   ) {
-    return await this.userService.updateUser(id, body);
+    const user = await this.userService.updateUser(id, body);
+
+    return response(true, 'Usuario actualizado', user);
   }
 
   @Roles('ADMIN')
   @Delete(':id')
   public async deleteUser(@Param('id') id: number) {
-    return await this.userService.deleteUser(id);
+    const user = await this.userService.deleteUser(id);
+    return response(true, 'Usuario eliminado', user);
   }
 }

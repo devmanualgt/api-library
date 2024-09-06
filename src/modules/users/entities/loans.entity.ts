@@ -5,16 +5,19 @@ import { BookEntity } from '../../book/entities/book.entity';
 import { ILoan } from '../interfaces/loan.interface';
 
 @Entity({ name: 'loans' })
-export class LoanEntity extends BaseEntity implements ILoan {
-  @Column()
-  loan_date: Date;
+export class UserLoanEntity extends BaseEntity implements ILoan {
+  @Column({
+    type: 'timestamp',
+    nullable: true,
+  })
+  returnDate: Date | null;
 
-  @Column()
-  return_date: Date;
+  @Column({ default: false }) // Para gestionar si se han entregado todos los libros prestados
+  loanTerminate: boolean;
 
-  @ManyToOne(() => UsersEntity, (user) => user.booksLoades)
+  @ManyToOne(() => UsersEntity, (user) => user.booksOnLoan)
   user: UsersEntity;
 
-  @ManyToOne(() => BookEntity, (book) => book.usersLoades)
+  @ManyToOne(() => BookEntity, (book) => book.usersOnBook)
   book: BookEntity;
 }

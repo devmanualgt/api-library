@@ -1,7 +1,7 @@
 import { BaseEntity } from '../../../_global/entities/base-entity';
 import { Column, Entity, OneToMany } from 'typeorm';
 import { IBook } from '../interfaces/book.interface';
-import { LoanEntity } from '../../users/entities/loans.entity';
+import { UserLoanEntity } from '../../users/entities/loans.entity';
 
 @Entity({ name: 'book' })
 export class BookEntity extends BaseEntity implements IBook {
@@ -23,9 +23,15 @@ export class BookEntity extends BaseEntity implements IBook {
   @Column({ default: 0 })
   quantity: number;
 
+  @Column({
+    default:
+      'https://myprecargas.s3.amazonaws.com/banners/20240906T003033787.png',
+  })
+  link_img: string;
+
   @Column()
   topics: string;
 
-  @OneToMany(() => LoanEntity, (userBooks) => userBooks.book)
-  usersLoades: LoanEntity[];
+  @OneToMany(() => UserLoanEntity, (userBooks) => userBooks.book)
+  usersOnBook: UserLoanEntity[];
 }
