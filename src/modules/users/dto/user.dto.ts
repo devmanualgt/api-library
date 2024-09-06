@@ -8,7 +8,7 @@ import {
 } from 'class-validator';
 import { ROLES } from '../../../constants/roles';
 import { UsersEntity } from '../entities/user.entity';
-import { BookEntity } from 'src/modules/book/entities/book.entity';
+import { BookEntity } from '../../../modules/book/entities/book.entity';
 
 export class UserDTO {
   @IsNotEmpty()

@@ -7,8 +7,8 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { AuthDTO } from '../dto/auth.dto';
-import { response } from 'src/util/response.manager';
-import { ROLES } from 'src/constants/roles';
+import { response } from '../../../util/response.manager';
+import { ROLES } from '../../../constants/roles';
 
 @Controller('auth')
 export class AuthController {

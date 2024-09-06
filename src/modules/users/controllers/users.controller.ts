@@ -15,7 +15,7 @@ import { PublicAccess } from '../../../modules/auth/decorators/public.decorator'
 import { AuthGuard } from '../../../modules/auth/guards/auth.guard';
 import { RolesGuard } from '../../../modules/auth/guards/roles.guard';
 import { Roles } from '../../../modules/auth/decorators/roles.decorator';
-import { response } from 'src/util/response.manager';
+import { response } from '../../../util/response.manager';
 
 @Controller('users')
 @UseGuards(AuthGuard, RolesGuard)

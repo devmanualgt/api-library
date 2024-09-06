@@ -4,9 +4,9 @@ import { Repository } from 'typeorm';
 import { BaseRepository } from '../../../_global/repositories/base-repository';
 import { UserLoanEntity } from '../entities/loans.entity';
 import { UserLoanBookDTO, UserReturnBookDTO } from '../dto/user.dto';
-import { ErrorManager } from 'src/util/error.manager';
-import { BookRepository } from 'src/modules/book/repositories/book.repository';
-import { response } from 'src/util/response.manager';
+import { ErrorManager } from '../../../util/error.manager';
+import { BookRepository } from '../../../modules/book/repositories/book.repository';
+import { response } from '../../../util/response.manager';
 
 @Injectable()
 export class UserLoandRepository extends BaseRepository<UserLoanEntity> {

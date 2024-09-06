@@ -3,7 +3,7 @@ import { AuthGuard } from '../../../modules/auth/guards/auth.guard';
 import { RolesGuard } from '../../../modules/auth/guards/roles.guard';
 import { UserService } from '../services/user.service';
 import { UserLoanBookDTO, UserReturnBookDTO } from '../dto/user.dto';
-import { response } from 'src/util/response.manager';
+import { response } from '../../../util/response.manager';
 
 @Controller('users/loans')
 @UseGuards(AuthGuard, RolesGuard)
