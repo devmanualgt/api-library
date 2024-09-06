@@ -25,9 +25,9 @@ export class ErrorManager extends Error {
     const name = message.split(' :: ')[0];
     const final_message = message.split(' :: ')[1];
     if (name) {
-      throw new HttpException(final_message, HttpStatus[name]);
+      throw new HttpException(message, HttpStatus[name]);
     } else {
-      throw new HttpException(final_message, HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 }
@@ -46,7 +46,6 @@ export class CustomExceptionFilter implements ExceptionFilter {
       exception['response']['message'] ||
       exception.message ||
       'Unexpected error';
-    console.log(exception['response']['message']);
 
     res.status(status).json(
       response(false, message), // Usar la estructura response
