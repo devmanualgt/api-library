@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UsersEntity } from '../entities/user.entity';
 import { UserDTO } from '../dto/user.dto';
-import * as bcrypt from 'bcrypt';
 import { ErrorManager } from '../../../util/error.manager';
 import { BaseRepository } from '../../../_global/repositories/base-repository';
 
@@ -19,66 +18,7 @@ export class UserRepository extends BaseRepository<UsersEntity> {
     ]);
   }
 
-  async create(body: UserDTO): Promise<UsersEntity> {
-    try {
-      const userByUsername = await this.findBy({
-        key: 'username',
-        value: body.username,
-      });
-      const userByEmail = await this.findBy({
-        key: 'email',
-        value: body.email,
-      });
-
-      if (userByUsername || userByEmail) {
-        throw new ErrorManager({
-          type: 'BAD_REQUEST',
-          message: 'El usuario y/o correo ya existe',
-        });
-      }
-      body.password = await bcrypt.hash(body.password, +process.env.HASH_SALT);
-      return this.userRepository.save(body);
-    } catch (error) {
-      throw ErrorManager.createSignatureError(error.message);
-    }
-  }
-
-  async findAllAgrup(): Promise<any[]> {
-    const all = await this.findAll();
-    const agrup = all.map((user) => {
-      const groupedLoans = {
-        activeLoans: [],
-        completedLoans: [],
-      };
-
-      // Si hay préstamos en booksOnLoan
-      if (user.booksOnLoan.length > 0) {
-        user.booksOnLoan.forEach((loan) => {
-          if (loan.loanTerminate) {
-            groupedLoans.completedLoans.push(loan);
-          } else {
-            groupedLoans.activeLoans.push(loan);
-          }
-        });
-      }
-
-      // Retornar el usuario con los préstamos agrupados
-      const { booksOnLoan, ...restUser } = user; // Eliminar booksOnLoan
-
-      return {
-        ...restUser,
-        loans: groupedLoans,
-      };
-    });
-
-    return agrup;
-  }
-
-  async findByEmail(email: string): Promise<UsersEntity> {
-    return this.userRepository.findOne({ where: { email } });
-  }
-
-  async findBy({ key, value }: { key: keyof UserDTO; value: any }) {
+  async findByUser({ key, value }: { key: keyof UserDTO; value: any }) {
     try {
       const user: UsersEntity = await this.userRepository
         .createQueryBuilder('user')

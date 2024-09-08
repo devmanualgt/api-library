@@ -9,6 +9,8 @@ import {
 import { UserRepository } from '../repositories/user.repository';
 import { DeleteResult, UpdateResult } from 'typeorm';
 import { UserLoandRepository } from '../repositories/user.loan.repository';
+import { ErrorManager } from 'src/util/error.manager';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -17,12 +19,57 @@ export class UserService {
     private readonly userLoadRepository: UserLoandRepository,
   ) {}
 
-  async createUser(createUserDto: UserDTO): Promise<UsersEntity> {
-    return await this.userRepository.create(createUserDto);
+  async createUser(body: UserDTO): Promise<UsersEntity> {
+    const userByUsername = await this.userRepository.findByUser({
+      key: 'username',
+      value: body.username,
+    });
+    const userByEmail = await this.userRepository.findByUser({
+      key: 'email',
+      value: body.email,
+    });
+
+    if (userByUsername || userByEmail) {
+      throw new ErrorManager({
+        type: 'BAD_REQUEST',
+        message: 'El usuario y/o correo ya existe',
+      });
+    }
+
+    body.password = await bcrypt.hash(body.password, +process.env.HASH_SALT);
+
+    return await this.userRepository.create(body);
   }
 
   async getUsers(): Promise<any[]> {
-    return await this.userRepository.findAllAgrup();
+    const all = await this.userRepository.findAll();
+    const agrup = all.map((user) => {
+      const groupedLoans = {
+        activeLoans: [],
+        completedLoans: [],
+      };
+
+      // Si hay préstamos en booksOnLoan
+      if (user.booksOnLoan.length > 0) {
+        user.booksOnLoan.forEach((loan) => {
+          if (loan.loanTerminate) {
+            groupedLoans.completedLoans.push(loan);
+          } else {
+            groupedLoans.activeLoans.push(loan);
+          }
+        });
+      }
+
+      // Retornar el usuario con los préstamos agrupados
+      const { booksOnLoan, ...restUser } = user; // Eliminar booksOnLoan
+
+      return {
+        ...restUser,
+        loans: groupedLoans,
+      };
+    });
+
+    return agrup;
   }
 
   async getUserById(id: number): Promise<UsersEntity> {
@@ -38,14 +85,6 @@ export class UserService {
 
   async deleteUser(id: number): Promise<DeleteResult> {
     return await this.userRepository.delete(id);
-  }
-
-  async getUserByEmail(email: string): Promise<UsersEntity> {
-    return await this.userRepository.findByEmail(email);
-  }
-
-  async findBy({ key, value }: { key: keyof UserDTO; value: any }) {
-    return this.userRepository.findBy({ key, value });
   }
 
   async findByList(conditions: { key: keyof UserDTO; value: any }[]) {
