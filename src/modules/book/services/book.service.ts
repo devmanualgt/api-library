@@ -31,8 +31,8 @@ export class BookService {
     return await this.bookRepository.delete(id);
   }
 
-  async findBy({ key, value }: { key: keyof BookDTO; value: any }) {
-    return await this.bookRepository.findBy({ key, value });
+  async findByElement({ key, value }: { key: keyof BookDTO; value: any }) {
+    return await this.bookRepository.findByElement({ key, value });
   }
 
   async findByList(conditions: { key: keyof BookDTO; value: any }[]) {

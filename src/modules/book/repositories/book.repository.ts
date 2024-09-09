@@ -18,18 +18,6 @@ export class BookRepository extends BaseRepository<BookEntity> {
     ]);
   }
 
-  async findBy({ key, value }: { key: keyof BookDTO; value: any }) {
-    try {
-      const book: BookEntity = await this.bookRepository
-        .createQueryBuilder('book')
-        .where({ [key]: value })
-        .getOne();
-      return book;
-    } catch (error) {
-      throw ErrorManager.createSignatureError(error.message);
-    }
-  }
-
   async findByList(
     conditions: { key: keyof BookDTO; value: any }[],
   ): Promise<BookEntity[] | null> {
