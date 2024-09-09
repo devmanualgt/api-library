@@ -112,7 +112,7 @@ export class UserService {
       }
 
       // Verificar si hay suficientes libros disponibles
-      const currentBook = await this.bookService.getBookById(body.book.id);
+      const currentBook = await this.bookService.getBookById(+body.book);
       if (currentBook.quantity < 1) {
         throw new ErrorManager({
           type: 'BAD_REQUEST',
@@ -121,10 +121,7 @@ export class UserService {
       }
 
       // Actualizar la cantidad de libros disponibles
-      const updateUserDto = {
-        quantity: currentBook.quantity - 1,
-      };
-      await this.bookService.updateBook(body.book.id, updateUserDto);
+      await this.bookService.decrementQuantityBook(+body.book);
 
       // Crear un nuevo préstamo
       const createdLoan = await this.userLoadRepository.create(body);
@@ -136,11 +133,38 @@ export class UserService {
   }
 
   async userRetunBook(body: UserReturnBookDTO) {
-    return await this.userLoadRepository.userReturnBook(body);
+    try {
+      const loan = await this.userLoadRepository.findOne(body.loan_id);
+      if (loan.loanTerminate) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'El libro ya fue devuelto',
+        });
+      }
+
+      loan.returnDate = new Date();
+      loan.loanTerminate = true;
+
+      // actualizar cantidad disponible del libro
+      await this.bookService.incrementQuantityBook(+loan.book);
+
+      return await this.userLoadRepository.update(body.loan_id, loan);
+    } catch (error) {
+      throw ErrorManager.createSignatureError(error.message);
+    }
   }
 
   async getLoansFilter(terminate: boolean) {
-    return await this.userLoadRepository.getLoansFilter(terminate);
+    try {
+      const loans = await this.userLoadRepository.findAll();
+      const filteredLoans = loans.filter(
+        (loan) => loan.loanTerminate === terminate,
+      );
+
+      return filteredLoans;
+    } catch (error) {
+      throw ErrorManager.createSignatureError(error.message);
+    }
   }
 
   async getLoans() {
