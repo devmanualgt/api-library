@@ -72,6 +72,10 @@ export class UserService {
     return agrup;
   }
 
+  async findByElement({ key, value }: { key: keyof UserDTO; value: any }) {
+    return await this.userRepository.findByElement({ key, value });
+  }
+
   async getUserById(id: number): Promise<UsersEntity> {
     return await this.userRepository.findOne(id);
   }

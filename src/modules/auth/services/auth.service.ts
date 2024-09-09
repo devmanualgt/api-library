@@ -11,11 +11,11 @@ export class AuthService {
   constructor(private readonly userService: UserService) {}
 
   async validateUser(username: string, password: string) {
-    const userByUsername = await this.userService.findBy({
+    const userByUsername = await this.userService.findByElement({
       key: 'username',
       value: username,
     });
-    const userByEmail = await this.userService.findBy({
+    const userByEmail = await this.userService.findByElement({
       key: 'email',
       value: username,
     });
