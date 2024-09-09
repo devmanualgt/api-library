@@ -41,7 +41,6 @@ export abstract class BaseRepository<T extends BaseEntity> {
         });
       }
       return await this.repository.save(newEntity);
-      //return response(true, 'Registro guardado, correctamente', save);
     } catch (error) {
       throw ErrorManager.createSignatureError(error.message);
     }
@@ -50,19 +49,9 @@ export abstract class BaseRepository<T extends BaseEntity> {
   async findAll(): Promise<T[]> {
     try {
       const queryBuilder = this.repository.createQueryBuilder('entity');
-
-      // Aplicar relaciones complejas (joins)
       this.applyJoins(queryBuilder);
       queryBuilder.orderBy('entity.id', 'ASC');
-
       const tuplas: T[] = await queryBuilder.getMany();
-      /* if (tuplas.length === 0) {
-        throw new ErrorManager({
-          type: 'BAD_REQUEST',
-          message: 'No se encontró resultado',
-        });
-      } */
-      // return response(true, 'Datos consultados correctamente', tuplas);
       return tuplas;
     } catch (error) {
       throw ErrorManager.createSignatureError(error.message);
@@ -74,10 +63,7 @@ export abstract class BaseRepository<T extends BaseEntity> {
       const queryBuilder = this.repository
         .createQueryBuilder('entity')
         .where('entity.id = :id', { id });
-
-      // Aplicar relaciones complejas (joins)
       this.applyJoins(queryBuilder);
-
       const tupla: T | undefined = await queryBuilder.getOne();
       if (!tupla) {
         throw new ErrorManager({
@@ -87,6 +73,18 @@ export abstract class BaseRepository<T extends BaseEntity> {
       }
 
       return tupla;
+    } catch (error) {
+      throw ErrorManager.createSignatureError(error.message);
+    }
+  }
+
+  async findByElement({ key, value }: { key: keyof T; value: any }) {
+    try {
+      const search: BaseEntity = await this.repository
+        .createQueryBuilder('entity')
+        .where({ [key]: value })
+        .getOne();
+      return search;
     } catch (error) {
       throw ErrorManager.createSignatureError(error.message);
     }
@@ -117,11 +115,6 @@ export abstract class BaseRepository<T extends BaseEntity> {
           message: 'No se encontró la entidad actualizada',
         });
       }
-
-      /* return response(true, 'Datos actualizados correctamente', {
-        updateResult,
-        updatedEntity,
-      }); */
       return { updateResult, updatedEntity };
     } catch (error) {
       throw ErrorManager.createSignatureError(error.message);
@@ -138,8 +131,6 @@ export abstract class BaseRepository<T extends BaseEntity> {
           message: 'No se encontro resultado',
         });
       }
-
-      //return response(true, 'Registro eliminado correctamente', tupla);
       return tupla;
     } catch (error) {
       throw ErrorManager.createSignatureError(error.message);
