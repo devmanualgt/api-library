@@ -46,7 +46,7 @@ export class UsersController {
       value,
     }));
 
-    const users = await this.userService.findByList(conditions);
+    const users = await this.userService.filterSearch(conditions);
 
     return response(true, 'Usuarios consultados correctamente', users);
   }

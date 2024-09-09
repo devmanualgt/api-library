@@ -90,6 +90,38 @@ export abstract class BaseRepository<T extends BaseEntity> {
     }
   }
 
+  async filterSearch(
+    conditions: { key: keyof T; value: any }[],
+  ): Promise<T[] | null> {
+    try {
+      const queryBuilder: SelectQueryBuilder<T> =
+        this.repository.createQueryBuilder('entity');
+
+      conditions.forEach((condition, index) => {
+        const likeValue = `%${condition.value}%`;
+        if (index === 0) {
+          queryBuilder.where(
+            `${'entity'}.${String(condition.key)} LIKE :value`,
+            {
+              value: likeValue,
+            },
+          );
+        } else {
+          queryBuilder.orWhere(
+            `${'entity'}.${String(condition.key)} LIKE :value`,
+            {
+              value: likeValue,
+            },
+          );
+        }
+      });
+
+      return await queryBuilder.getMany();
+    } catch (error) {
+      throw new Error(`Error in findByList: ${error.message}`);
+    }
+  }
+
   async update(
     id: number,
     updateEntityDto: any,

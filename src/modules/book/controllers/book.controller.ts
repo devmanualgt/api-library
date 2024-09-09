@@ -41,7 +41,7 @@ export class BookController {
       value,
     }));
 
-    return await this.bookService.findByList(conditions);
+    return await this.bookService.filterSearch(conditions);
   }
 
   @Get(':id')

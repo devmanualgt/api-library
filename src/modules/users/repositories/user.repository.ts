@@ -18,7 +18,7 @@ export class UserRepository extends BaseRepository<UsersEntity> {
     ]);
   }
 
-  async findByUser({ key, value }: { key: keyof UserDTO; value: any }) {
+  async findByElement({ key, value }: { key: keyof UserDTO; value: any }) {
     try {
       const user: UsersEntity = await this.userRepository
         .createQueryBuilder('user')
@@ -26,52 +26,6 @@ export class UserRepository extends BaseRepository<UsersEntity> {
         .where({ [key]: value })
         .getOne();
       return user;
-    } catch (error) {
-      throw ErrorManager.createSignatureError(error.message);
-    }
-  }
-
-  async findByList(
-    conditions: { key: keyof UserDTO; value: any }[],
-  ): Promise<UsersEntity[] | null> {
-    try {
-      const queryBuilder = this.userRepository
-        .createQueryBuilder('user')
-        .addSelect('user.password');
-
-      conditions.forEach((condition, index) => {
-        const value = condition.value;
-
-        // Verificar si el campo es de tipo string para usar LIKE, si no, usar igualdad
-        const isStringColumn = [
-          'firstName',
-          'lastName',
-          'email',
-          'username',
-        ].includes(condition.key as string);
-
-        if (isStringColumn) {
-          const likeValue = `%${value}%`;
-          if (index === 0) {
-            queryBuilder.where(`${condition.key} LIKE :value`, {
-              value: likeValue,
-            });
-          } else {
-            queryBuilder.orWhere(`${condition.key} LIKE :value`, {
-              value: likeValue,
-            });
-          }
-        } else {
-          if (index === 0) {
-            queryBuilder.where(`${condition.key} = :value`, { value });
-          } else {
-            queryBuilder.orWhere(`${condition.key} = :value`, { value });
-          }
-        }
-      });
-
-      const users = await queryBuilder.getMany();
-      return users;
     } catch (error) {
       throw ErrorManager.createSignatureError(error.message);
     }

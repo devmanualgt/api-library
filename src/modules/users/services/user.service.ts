@@ -20,11 +20,11 @@ export class UserService {
   ) {}
 
   async createUser(body: UserDTO): Promise<UsersEntity> {
-    const userByUsername = await this.userRepository.findByUser({
+    const userByUsername = await this.userRepository.findByElement({
       key: 'username',
       value: body.username,
     });
-    const userByEmail = await this.userRepository.findByUser({
+    const userByEmail = await this.userRepository.findByElement({
       key: 'email',
       value: body.email,
     });
@@ -87,8 +87,8 @@ export class UserService {
     return await this.userRepository.delete(id);
   }
 
-  async findByList(conditions: { key: keyof UserDTO; value: any }[]) {
-    return this.userRepository.findByList(conditions);
+  async filterSearch(conditions: { key: keyof UserDTO; value: any }[]) {
+    return this.userRepository.filterSearch(conditions);
   }
 
   async userLoadBook(body: UserLoanBookDTO) {

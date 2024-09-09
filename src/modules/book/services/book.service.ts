@@ -35,7 +35,7 @@ export class BookService {
     return await this.bookRepository.findByElement({ key, value });
   }
 
-  async findByList(conditions: { key: keyof BookDTO; value: any }[]) {
-    return await this.bookRepository.findByList(conditions);
+  async filterSearch(conditions: { key: keyof BookDTO; value: any }[]) {
+    return await this.bookRepository.filterSearch(conditions);
   }
 }
