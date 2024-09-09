@@ -97,28 +97,49 @@ export abstract class BaseRepository<T extends BaseEntity> {
       const queryBuilder: SelectQueryBuilder<T> =
         this.repository.createQueryBuilder('entity');
 
+      const metadata = this.repository.metadata;
+
       conditions.forEach((condition, index) => {
-        const likeValue = `%${condition.value}%`;
-        if (index === 0) {
-          queryBuilder.where(
-            `${'entity'}.${String(condition.key)} LIKE :value`,
-            {
+        let value = condition.value;
+        const column = condition.key as string;
+
+        const column_meta = metadata.columns.find(
+          (col) => col.propertyName === column,
+        );
+
+        //console.log(column_meta.type.toString());
+
+        // Verificar si el valor es string o number para usar LIKE o =
+        if (column_meta.type.toString().includes('String')) {
+          const likeValue = `%${value}%`;
+          if (index === 0) {
+            queryBuilder.where(`entity.${column} LIKE :value`, {
               value: likeValue,
-            },
-          );
+            });
+          } else {
+            queryBuilder.orWhere(`entity.${column} LIKE :value`, {
+              value: likeValue,
+            });
+          }
+        } else if (column_meta.type.toString().includes('Number')) {
+          value = value * 1;
+
+          if (index === 0) {
+            queryBuilder.where(`entity.${column} = CAST(${value} AS NUMERIC)`);
+          } else {
+            queryBuilder.orWhere(
+              `entity.${column} = CAST(${value} AS NUMERIC)`,
+            );
+          }
         } else {
-          queryBuilder.orWhere(
-            `${'entity'}.${String(condition.key)} LIKE :value`,
-            {
-              value: likeValue,
-            },
-          );
+          console.log('nada');
         }
       });
 
       return await queryBuilder.getMany();
     } catch (error) {
-      throw new Error(`Error in findByList: ${error.message}`);
+      throw new Error(`Error in filterSearch: ${error.message}`);
+      //throw ErrorManager.createSignatureError(error.message);
     }
   }
 
