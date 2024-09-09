@@ -21,6 +21,19 @@ export class UserLoandRepository extends BaseRepository<UserLoanEntity> {
     ]);
   }
 
+  async findActiveLoan(
+    userId: any,
+    bookId: any,
+  ): Promise<UserLoanEntity | null> {
+    return this.userLoandRepository.findOne({
+      where: {
+        user: { id: userId },
+        book: { id: bookId },
+        loanTerminate: false,
+      },
+    });
+  }
+
   async userLoadBook(body: UserLoanBookDTO) {
     try {
       const existingLoan = await this.userLoandRepository.findOne({

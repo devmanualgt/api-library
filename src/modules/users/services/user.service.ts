@@ -11,12 +11,14 @@ import { DeleteResult, UpdateResult } from 'typeorm';
 import { UserLoandRepository } from '../repositories/user.loan.repository';
 import { ErrorManager } from 'src/util/error.manager';
 import * as bcrypt from 'bcrypt';
+import { BookService } from 'src/modules/book/services/book.service';
 
 @Injectable()
 export class UserService {
   constructor(
     private readonly userRepository: UserRepository,
     private readonly userLoadRepository: UserLoandRepository,
+    private readonly bookService: BookService,
   ) {}
 
   async createUser(body: UserDTO): Promise<UsersEntity> {
@@ -96,7 +98,41 @@ export class UserService {
   }
 
   async userLoadBook(body: UserLoanBookDTO) {
-    return await this.userLoadRepository.userLoadBook(body);
+    try {
+      // Verificar si el usuario ya tiene un préstamo activo del libro
+      const existingLoan = await this.userLoadRepository.findActiveLoan(
+        body.user,
+        body.book,
+      );
+      if (existingLoan) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'El usuario ya tiene un préstamo activo de este libro.',
+        });
+      }
+
+      // Verificar si hay suficientes libros disponibles
+      const currentBook = await this.bookService.getBookById(body.book.id);
+      if (currentBook.quantity < 1) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'No hay suficientes libros disponibles',
+        });
+      }
+
+      // Actualizar la cantidad de libros disponibles
+      const updateUserDto = {
+        quantity: currentBook.quantity - 1,
+      };
+      await this.bookService.updateBook(body.book.id, updateUserDto);
+
+      // Crear un nuevo préstamo
+      const createdLoan = await this.userLoadRepository.create(body);
+
+      return createdLoan;
+    } catch (error) {
+      throw ErrorManager.createSignatureError(error.message);
+    }
   }
 
   async userRetunBook(body: UserReturnBookDTO) {
