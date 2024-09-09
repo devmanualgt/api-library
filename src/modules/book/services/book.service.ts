@@ -38,4 +38,12 @@ export class BookService {
   async filterSearch(conditions: { key: keyof BookDTO; value: any }[]) {
     return await this.bookRepository.filterSearch(conditions);
   }
+
+  async incrementQuantityBook(book_id) {
+    return await this.bookRepository.updateBookQuantity(book_id, 1);
+  }
+
+  async decrementQuantityBook(book_id) {
+    return await this.bookRepository.updateBookQuantity(book_id, -1);
+  }
 }

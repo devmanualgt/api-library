@@ -15,4 +15,21 @@ export class BookRepository extends BaseRepository<BookEntity> {
       { alias: 'usersOnBook', relation: 'user' },
     ]);
   }
+
+  async updateBookQuantity(book_id: number, change: number) {
+    const book = await this.findOne(book_id);
+    if (book) {
+      return await this.bookRepository.update(book_id, {
+        quantity: book.quantity + change,
+      });
+    }
+  }
+
+  async incrementQuantityBook(book_id) {
+    return await this.updateBookQuantity(book_id, 1);
+  }
+
+  async decrementQuantityBook(book_id) {
+    return await this.updateBookQuantity(book_id, -1);
+  }
 }
