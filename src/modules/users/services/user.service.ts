@@ -134,7 +134,7 @@ export class UserService {
 
   async userRetunBook(body: UserReturnBookDTO) {
     try {
-      const loan = await this.userLoadRepository.findOne(body.loan_id);
+      const loan = await this.userLoadRepository.findOne(+body.loan_id);
       if (loan.loanTerminate) {
         throw new ErrorManager({
           type: 'BAD_REQUEST',
@@ -146,7 +146,7 @@ export class UserService {
       loan.loanTerminate = true;
 
       // actualizar cantidad disponible del libro
-      await this.bookService.incrementQuantityBook(+loan.book);
+      await this.bookService.incrementQuantityBook(+loan.book.id);
 
       return await this.userLoadRepository.update(body.loan_id, loan);
     } catch (error) {
