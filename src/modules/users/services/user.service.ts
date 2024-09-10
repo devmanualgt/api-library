@@ -9,9 +9,9 @@ import {
 import { UserRepository } from '../repositories/user.repository';
 import { DeleteResult, UpdateResult } from 'typeorm';
 import { UserLoandRepository } from '../repositories/user.loan.repository';
-import { ErrorManager } from 'src/util/error.manager';
+import { ErrorManager } from '../../../util/error.manager';
 import * as bcrypt from 'bcrypt';
-import { BookService } from 'src/modules/book/services/book.service';
+import { BookService } from '../../../modules/book/services/book.service';
 
 @Injectable()
 export class UserService {
