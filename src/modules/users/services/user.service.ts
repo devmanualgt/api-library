@@ -154,14 +154,14 @@ export class UserService {
     }
   }
 
-  async getLoansFilter(terminate: boolean) {
+  async getLoansFilter(terminate: string) {
     try {
-      const loans = await this.userLoadRepository.findAll();
-      const filteredLoans = loans.filter(
-        (loan) => loan.loanTerminate === terminate,
-      );
-
-      return filteredLoans;
+      if (terminate) {
+        const terminateBool = terminate === 'true' ? true : false;
+        return await this.userLoadRepository.filterTerminated(terminateBool);
+      }
+      // Si no hay filtro de estado, devolver todos los préstamos
+      return await this.getLoans();
     } catch (error) {
       throw ErrorManager.createSignatureError(error.message);
     }

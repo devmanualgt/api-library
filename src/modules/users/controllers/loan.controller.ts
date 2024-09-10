@@ -24,13 +24,7 @@ export class LoanController {
 
   @Get('list')
   async getLoansFilter(@Query('terminate') terminate?: string) {
-    let list;
-    if (terminate) {
-      const terminateBool = terminate === 'true';
-      list = await this.userService.getLoansFilter(terminateBool);
-    } else {
-      list = await this.userService.getLoans();
-    }
+    const list = await this.userService.getLoansFilter(terminate);
     return response(true, 'Prestamos', list);
   }
 }
