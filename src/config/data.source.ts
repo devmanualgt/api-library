@@ -21,7 +21,9 @@ export const DataSourceConfig: DataSourceOptions = {
   migrationsRun: true,
   logging: false,
   namingStrategy: new SnakeNamingStrategy(),
-  ssl: true,
+  ssl: {
+    rejectUnauthorized: false,
+  },
 };
 
 export const AppDS = new DataSource(DataSourceConfig);
