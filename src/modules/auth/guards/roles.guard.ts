@@ -58,12 +58,12 @@ export class RolesGuard implements CanActivate {
       } else {
         throw new UnauthorizedException('Acceso denegado');
       }
-    }
+    } else {
+      const isAuth = roles.some((role) => role === roleUser);
 
-    const isAuth = roles.some((role) => role === roleUser);
-
-    if (!isAuth) {
-      throw new UnauthorizedException('Acceso denegado');
+      if (!isAuth) {
+        throw new UnauthorizedException('Acceso denegado');
+      }
     }
   }
 }

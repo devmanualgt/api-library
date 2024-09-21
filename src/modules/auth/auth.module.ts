@@ -11,5 +11,6 @@ import { BookModule } from '../book/book.module';
   imports: [UsersModule, BookModule],
   providers: [AuthService, UserService, UserRepository],
   controllers: [AuthController],
+  exports: [AuthService],
 })
 export class AuthModule {}

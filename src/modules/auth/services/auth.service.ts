@@ -5,6 +5,7 @@ import * as jwt from 'jsonwebtoken';
 import { UsersEntity } from '../../../modules/users/entities/user.entity';
 import { PayloadToken } from '../interfaces/auth.interface';
 import { response } from '../../../util/response.manager';
+import * as CryptoJS from 'crypto-js';
 
 @Injectable()
 export class AuthService {
@@ -57,13 +58,31 @@ export class AuthService {
       username: getUser.username,
     };
 
-    return response(true, 'Login success', {
-      accessToken: this.singJWT({
-        payload: payload,
-        secret: process.env.SECRET_KEY_AUTH,
-        expires: '1h',
-      }),
-      user,
+    const jwt = this.singJWT({
+      payload: payload,
+      secret: process.env.SECRET_KEY_AUTH,
+      expires: '1h',
     });
+
+    const has = await this.criptoJWT(jwt);
+    //console.log(has);
+
+    return response(true, 'Login success', {
+      accessToken: has,
+      user: { id: user.id },
+    });
+  }
+
+  async criptoJWT(data) {
+    const secretKey = process.env.SECRET_KEY_AUTH;
+    const encrypted = CryptoJS.AES.encrypt(data, secretKey).toString();
+    return encrypted;
+  }
+
+  async descrptoJWT(encrypted) {
+    const secretKey = process.env.SECRET_KEY_AUTH;
+    const decryptedBytes = CryptoJS.AES.decrypt(encrypted, secretKey);
+    const decrypted = decryptedBytes.toString(CryptoJS.enc.Utf8);
+    return decrypted;
   }
 }
