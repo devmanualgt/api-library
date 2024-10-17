@@ -2,9 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BaseRepository } from '../../../_global/repositories/base-repository';
 import { Repository } from 'typeorm';
-import { ErrorManager } from '../../../util/error.manager';
 import { BookEntity } from '../entities/book.entity';
-import { BookDTO } from '../dto/book.dto';
 
 @Injectable()
 export class BookRepository extends BaseRepository<BookEntity> {
@@ -18,41 +16,20 @@ export class BookRepository extends BaseRepository<BookEntity> {
     ]);
   }
 
-  async findBy({ key, value }: { key: keyof BookDTO; value: any }) {
-    try {
-      const book: BookEntity = await this.bookRepository
-        .createQueryBuilder('book')
-        .where({ [key]: value })
-        .getOne();
-      return book;
-    } catch (error) {
-      throw ErrorManager.createSignatureError(error.message);
+  async updateBookQuantity(book_id: number, change: number) {
+    const book = await this.findOne(book_id);
+    if (book) {
+      return await this.bookRepository.update(book_id, {
+        quantity: book.quantity + change,
+      });
     }
   }
 
-  async findByList(
-    conditions: { key: keyof BookDTO; value: any }[],
-  ): Promise<BookEntity[] | null> {
-    try {
-      const queryBuilder = this.bookRepository.createQueryBuilder('book');
+  async incrementQuantityBook(book_id) {
+    return await this.updateBookQuantity(book_id, 1);
+  }
 
-      conditions.forEach((condition, index) => {
-        const likeValue = `%${condition.value}%`;
-        if (index === 0) {
-          queryBuilder.where(`${condition.key} LIKE :value`, {
-            value: likeValue,
-          });
-        } else {
-          queryBuilder.orWhere(`${condition.key} LIKE :value`, {
-            value: likeValue,
-          });
-        }
-      });
-
-      const users = await queryBuilder.getMany();
-      return users;
-    } catch (error) {
-      throw ErrorManager.createSignatureError(error.message);
-    }
+  async decrementQuantityBook(book_id) {
+    return await this.updateBookQuantity(book_id, -1);
   }
 }

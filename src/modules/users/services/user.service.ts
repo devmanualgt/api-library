@@ -9,20 +9,73 @@ import {
 import { UserRepository } from '../repositories/user.repository';
 import { DeleteResult, UpdateResult } from 'typeorm';
 import { UserLoandRepository } from '../repositories/user.loan.repository';
+import { ErrorManager } from '../../../util/error.manager';
+import * as bcrypt from 'bcrypt';
+import { BookService } from '../../../modules/book/services/book.service';
 
 @Injectable()
 export class UserService {
   constructor(
     private readonly userRepository: UserRepository,
     private readonly userLoadRepository: UserLoandRepository,
+    private readonly bookService: BookService,
   ) {}
 
-  async createUser(createUserDto: UserDTO): Promise<UsersEntity> {
-    return await this.userRepository.create(createUserDto);
+  async createUser(body: UserDTO): Promise<UsersEntity> {
+    const userByUsername = await this.userRepository.findByElement({
+      key: 'username',
+      value: body.username,
+    });
+    const userByEmail = await this.userRepository.findByElement({
+      key: 'email',
+      value: body.email,
+    });
+
+    if (userByUsername || userByEmail) {
+      throw new ErrorManager({
+        type: 'BAD_REQUEST',
+        message: 'El usuario y/o correo ya existe',
+      });
+    }
+
+    body.password = await bcrypt.hash(body.password, +process.env.HASH_SALT);
+
+    return await this.userRepository.create(body);
   }
 
   async getUsers(): Promise<any[]> {
-    return await this.userRepository.findAllAgrup();
+    const all = await this.userRepository.findAll();
+    const agrup = all.map((user) => {
+      const groupedLoans = {
+        activeLoans: [],
+        completedLoans: [],
+      };
+
+      // Si hay préstamos en booksOnLoan
+      if (user.booksOnLoan.length > 0) {
+        user.booksOnLoan.forEach((loan) => {
+          if (loan.loanTerminate) {
+            groupedLoans.completedLoans.push(loan);
+          } else {
+            groupedLoans.activeLoans.push(loan);
+          }
+        });
+      }
+
+      // Retornar el usuario con los préstamos agrupados
+      const { booksOnLoan, ...restUser } = user; // Eliminar booksOnLoan
+
+      return {
+        ...restUser,
+        loans: groupedLoans,
+      };
+    });
+
+    return agrup;
+  }
+
+  async findByElement({ key, value }: { key: keyof UserDTO; value: any }) {
+    return await this.userRepository.findByElement({ key, value });
   }
 
   async getUserById(id: number): Promise<UsersEntity> {
@@ -40,28 +93,78 @@ export class UserService {
     return await this.userRepository.delete(id);
   }
 
-  async getUserByEmail(email: string): Promise<UsersEntity> {
-    return await this.userRepository.findByEmail(email);
-  }
-
-  async findBy({ key, value }: { key: keyof UserDTO; value: any }) {
-    return this.userRepository.findBy({ key, value });
-  }
-
-  async findByList(conditions: { key: keyof UserDTO; value: any }[]) {
-    return this.userRepository.findByList(conditions);
+  async filterSearch(conditions: { key: keyof UserDTO; value: any }[]) {
+    return this.userRepository.filterSearch(conditions);
   }
 
   async userLoadBook(body: UserLoanBookDTO) {
-    return await this.userLoadRepository.userLoadBook(body);
+    try {
+      // Verificar si el usuario ya tiene un préstamo activo del libro
+      const existingLoan = await this.userLoadRepository.findActiveLoan(
+        body.user,
+        body.book,
+      );
+      if (existingLoan) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'El usuario ya tiene un préstamo activo de este libro.',
+        });
+      }
+
+      // Verificar si hay suficientes libros disponibles
+      const currentBook = await this.bookService.getBookById(+body.book);
+      if (currentBook.quantity < 1) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'No hay suficientes libros disponibles',
+        });
+      }
+
+      // Actualizar la cantidad de libros disponibles
+      await this.bookService.decrementQuantityBook(+body.book);
+
+      // Crear un nuevo préstamo
+      const createdLoan = await this.userLoadRepository.create(body);
+
+      return createdLoan;
+    } catch (error) {
+      throw ErrorManager.createSignatureError(error.message);
+    }
   }
 
   async userRetunBook(body: UserReturnBookDTO) {
-    return await this.userLoadRepository.userReturnBook(body);
+    try {
+      const loan = await this.userLoadRepository.findOne(+body.loan_id);
+      if (loan.loanTerminate) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'El libro ya fue devuelto',
+        });
+      }
+
+      loan.returnDate = new Date();
+      loan.loanTerminate = true;
+
+      // actualizar cantidad disponible del libro
+      await this.bookService.incrementQuantityBook(+loan.book.id);
+
+      return await this.userLoadRepository.update(body.loan_id, loan);
+    } catch (error) {
+      throw ErrorManager.createSignatureError(error.message);
+    }
   }
 
-  async getLoansFilter(terminate: boolean) {
-    return await this.userLoadRepository.getLoansFilter(terminate);
+  async getLoansFilter(terminate: string) {
+    try {
+      if (terminate) {
+        const terminateBool = terminate === 'true' ? true : false;
+        return await this.userLoadRepository.filterTerminated(terminateBool);
+      }
+      // Si no hay filtro de estado, devolver todos los préstamos
+      return await this.getLoans();
+    } catch (error) {
+      throw ErrorManager.createSignatureError(error.message);
+    }
   }
 
   async getLoans() {

@@ -1,3 +1,4 @@
+import { AuthService } from './../services/auth.service';
 import { Reflector } from '@nestjs/core';
 import { UserService } from './../../users/services/user.service';
 import {
@@ -14,6 +15,7 @@ import { IUseToken } from '../interfaces/auth.interface';
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
+    private readonly authService: AuthService,
     private readonly userService: UserService,
     private readonly reflector: Reflector,
   ) {}
@@ -28,7 +30,10 @@ export class AuthGuard implements CanActivate {
     }
 
     const req = context.switchToHttp().getRequest<Request>();
-    const token = req.headers['authorization'];
+    const token = await this.authService.descrptoJWT(
+      req.headers['authorization'],
+    );
+    //const token = req.headers['authorization'];
     if (!token || Array.isArray(token)) {
       throw new UnauthorizedException('Token invalido');
     }

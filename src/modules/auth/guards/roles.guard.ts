@@ -10,6 +10,7 @@ import {
   ADMIN_KEY,
   PUBLIC_KEY,
   ROLES_KEY,
+  USER_KEY,
 } from '../../../constants/key-decorators';
 import { ROLES } from '../../../constants/roles';
 import { Request } from 'express';
@@ -34,29 +35,35 @@ export class RolesGuard implements CanActivate {
     );
 
     const admin = this.reflector.get<string>(ADMIN_KEY, context.getHandler());
-
+    const onlyUser = this.reflector.get<string>(USER_KEY, context.getHandler());
     const req = context.switchToHttp().getRequest<Request>();
     const { roleUser } = req;
-
-    if (roles === undefined) {
-      if (!admin) {
-        return true;
-      } else if (admin && roleUser === admin) {
-        return true;
-      } else {
-        throw new UnauthorizedException('Acceso denegado');
-      }
-    }
 
     if (roleUser === ROLES.ADMIN) {
       return true;
     }
 
-    const isAuth = roles.some((role) => role === roleUser);
+    if (roles === undefined) {
+      if (!admin) {
+        if (onlyUser) {
+          const valueToValidate = req.params[onlyUser] || req.body[onlyUser];
+          if (valueToValidate && +valueToValidate === +req.idUser) {
+            return true;
+          } else {
+            throw new UnauthorizedException('Acceso denegado');
+          }
+        }
+      } else if (admin && roleUser === admin) {
+        return true;
+      } else {
+        throw new UnauthorizedException('Acceso denegado');
+      }
+    } else {
+      const isAuth = roles.some((role) => role === roleUser);
 
-    if (!isAuth) {
-      throw new UnauthorizedException('Acceso denegado');
+      if (!isAuth) {
+        throw new UnauthorizedException('Acceso denegado');
+      }
     }
-    return true;
   }
 }

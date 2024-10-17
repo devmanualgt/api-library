@@ -7,7 +7,6 @@ import { UserRepository } from './repositories/user.repository';
 import { UserLoanEntity } from './entities/loans.entity';
 import { LoanController } from './controllers/loan.controller';
 import { UserLoandRepository } from './repositories/user.loan.repository';
-import { BookRepository } from '../book/repositories/book.repository';
 import { BookModule } from '../book/book.module';
 
 @Global()

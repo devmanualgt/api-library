@@ -11,18 +11,18 @@ import {
 } from '@nestjs/common';
 import { UserService } from '../services/user.service';
 import { UserDTO, UserUpdateDTO } from '../dto/user.dto';
-import { PublicAccess } from '../../../modules/auth/decorators/public.decorator';
 import { AuthGuard } from '../../../modules/auth/guards/auth.guard';
 import { RolesGuard } from '../../../modules/auth/guards/roles.guard';
 import { Roles } from '../../../modules/auth/decorators/roles.decorator';
 import { response } from '../../../util/response.manager';
+import { OnlyUserAccess } from '../../../modules/auth/decorators/only-user.decorator';
 
 @Controller('users')
 @UseGuards(AuthGuard, RolesGuard)
 export class UsersController {
   constructor(private readonly userService: UserService) {}
 
-  // @Roles('ADMIN')
+  @Roles('ADMIN')
   @Post('')
   public async create(@Body() body: UserDTO) {
     const users = await this.userService.createUser(body);
@@ -46,19 +46,19 @@ export class UsersController {
       value,
     }));
 
-    const users = await this.userService.findByList(conditions);
+    const users = await this.userService.filterSearch(conditions);
 
     return response(true, 'Usuarios consultados correctamente', users);
   }
 
-  @PublicAccess()
+  @OnlyUserAccess('id')
   @Get(':id')
   public async findUserById(@Param('id') id: number) {
     const user = await this.userService.getUserById(id);
     return response(true, 'Usuario consultados correctamente', user);
   }
 
-  @Roles('ADMIN')
+  @OnlyUserAccess('id')
   @Put(':id')
   public async updateUser(
     @Param('id') id: number,
@@ -69,7 +69,7 @@ export class UsersController {
     return response(true, 'Usuario actualizado', user);
   }
 
-  @Roles('ADMIN')
+  @OnlyUserAccess('id')
   @Delete(':id')
   public async deleteUser(@Param('id') id: number) {
     const user = await this.userService.deleteUser(id);

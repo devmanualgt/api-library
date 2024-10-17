@@ -14,6 +14,7 @@ import {
 } from '@nestjs/common';
 import { RolesGuard } from '../../../modules/auth/guards/roles.guard';
 import { Roles } from '../../../modules/auth/decorators/roles.decorator';
+import { PublicAccess } from '../../../modules/auth/decorators/public.decorator';
 
 @Controller('books')
 @UseGuards(AuthGuard, RolesGuard)
@@ -26,6 +27,7 @@ export class BookController {
     return await this.bookService.createBook(body);
   }
 
+  @PublicAccess()
   @Get()
   async getAll() {
     return await this.bookService.getBooks();
@@ -41,7 +43,7 @@ export class BookController {
       value,
     }));
 
-    return await this.bookService.findByList(conditions);
+    return await this.bookService.filterSearch(conditions);
   }
 
   @Get(':id')

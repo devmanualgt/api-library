@@ -3,10 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { BaseRepository } from '../../../_global/repositories/base-repository';
 import { UserLoanEntity } from '../entities/loans.entity';
-import { UserLoanBookDTO, UserReturnBookDTO } from '../dto/user.dto';
-import { ErrorManager } from '../../../util/error.manager';
 import { BookRepository } from '../../../modules/book/repositories/book.repository';
-import { response } from '../../../util/response.manager';
 
 @Injectable()
 export class UserLoandRepository extends BaseRepository<UserLoanEntity> {
@@ -21,81 +18,25 @@ export class UserLoandRepository extends BaseRepository<UserLoanEntity> {
     ]);
   }
 
-  async userLoadBook(body: UserLoanBookDTO) {
-    try {
-      const existingLoan = await this.userLoandRepository.findOne({
-        where: {
-          user: { id: +body.user },
-          book: { id: +body.book },
-          loanTerminate: false,
-        },
-      });
-
-      if (existingLoan) {
-        throw new ErrorManager({
-          type: 'BAD_REQUEST',
-          message: 'El usuario ya tiene un préstamo activo de este libro.',
-        });
-      }
-
-      const current_book = await this.bookRepository.findOne(+body.book);
-
-      if (current_book.quantity < 1) {
-        throw new ErrorManager({
-          type: 'BAD_REQUEST',
-          message: 'No hay suficientes libros disponibles',
-        });
-      }
-
-      const updateUserDto = {
-        quantity: current_book.quantity - 1,
-      };
-
-      await this.bookRepository.update(+body.book, updateUserDto);
-
-      const create = await this.create(body);
-      return response(true, 'Prestamo realizado.', create);
-    } catch (error) {
-      throw ErrorManager.createSignatureError(error.message);
-    }
+  async findActiveLoan(
+    userId: any,
+    bookId: any,
+  ): Promise<UserLoanEntity | null> {
+    return this.userLoandRepository.findOne({
+      where: {
+        user: { id: userId },
+        book: { id: bookId },
+        loanTerminate: false,
+      },
+    });
   }
 
-  async userReturnBook(body: UserReturnBookDTO) {
-    try {
-      const loan = await this.findOne(body.loan_id);
-      if (loan.loanTerminate) {
-        throw new ErrorManager({
-          type: 'BAD_REQUEST',
-          message: 'El libro ya fue devuelto',
-        });
-      }
-
-      loan.returnDate = new Date();
-      loan.loanTerminate = true;
-
-      const book = await this.bookRepository.findOne(+loan.book.id);
-      if (book) {
-        await this.bookRepository.update(+loan.book.id, {
-          quantity: book.quantity + 1,
-        });
-      }
-
-      return await this.update(body.loan_id, loan);
-    } catch (error) {
-      throw ErrorManager.createSignatureError(error.message);
-    }
-  }
-
-  async getLoansFilter(terminate?: boolean) {
-    try {
-      const loans = await this.findAll();
-      const filteredLoans = loans.filter(
-        (loan) => loan.loanTerminate === terminate,
-      );
-
-      return filteredLoans;
-    } catch (error) {
-      throw ErrorManager.createSignatureError(error.message);
-    }
+  async filterTerminated(terminate: boolean): Promise<UserLoanEntity[]> {
+    return await this.userLoandRepository.find({
+      where: {
+        loanTerminate: terminate,
+      },
+      relations: ['book', 'user'],
+    });
   }
 }
