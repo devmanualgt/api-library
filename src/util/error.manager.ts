@@ -6,7 +6,7 @@ import {
   HttpStatus,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 
 import { response } from './response.manager';
 
@@ -23,7 +23,6 @@ export class ErrorManager extends Error {
 
   static createSignatureError(message: string) {
     const name = message.split(' :: ')[0];
-    const final_message = message.split(' :: ')[1];
     if (name) {
       throw new HttpException(message, HttpStatus[name]);
     } else {
@@ -37,7 +36,6 @@ export class CustomExceptionFilter implements ExceptionFilter {
   catch(exception: UnauthorizedException | HttpException, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const res = ctx.getResponse<Response>();
-    const req = ctx.getRequest<Request>();
 
     const status =
       exception instanceof HttpException ? exception.getStatus() : 500;

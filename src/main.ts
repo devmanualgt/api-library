@@ -7,7 +7,7 @@ import { CustomExceptionFilter } from './util/error.manager';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  //app.use(morgan('dev'));
+  app.use(morgan('dev'));
 
   app.useGlobalPipes(
     new ValidationPipe({

@@ -99,6 +99,8 @@ export class UserService {
 
   async userLoadBook(body: UserLoanBookDTO) {
     try {
+      console.log('init');
+
       // Verificar si el usuario ya tiene un préstamo activo del libro
       const existingLoan = await this.userLoadRepository.findActiveLoan(
         body.user,
@@ -128,6 +130,8 @@ export class UserService {
 
       return createdLoan;
     } catch (error) {
+      console.log(error);
+
       throw ErrorManager.createSignatureError(error.message);
     }
   }

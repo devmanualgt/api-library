@@ -6,7 +6,6 @@ import { UserLoanBookDTO, UserReturnBookDTO } from '../dto/user.dto';
 import { response } from '../../../util/response.manager';
 
 @Controller('users/loans')
-@UseGuards(AuthGuard, RolesGuard)
 export class LoanController {
   constructor(private readonly userService: UserService) {}
 
